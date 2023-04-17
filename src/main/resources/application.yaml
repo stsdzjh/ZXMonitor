@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@192.168.1.200:1521:helowin
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    username: test
+    password: test
+
+monitor:
+  publishlog:
+    sche: 0 * * * * *      #0 */15 0,17-23 * * ?  #每日从17点开始 每15分钟一次至凌晨一点
+    sql: "select t.operdate  操作日期, t.opertime  操作时间, t.infolevel 信息级别, t.loginfo   日志信息, t.cleardate 清算日期 from clr_publishlog t where t.operdate = TO_CHAR(SYSDATE,'YYYYMMDD') and t.infolevel = '2'"
+    wav: monitor1
+  flowchart:
+    sche: 0 0 1 * * *   #每天只执行一次，每日凌晨1点(01:00:00)
+    sql: "select stepno,stepname,status from sys_flowchart t where (t.stepno >= 1 and t.stepno <= 20) and t.status <> '2' union all select stepno,stepname,status from sys_flowchart t where (t.stepno >= 51 and t.stepno <= 56) and t.status <> '2'"
+    wav: monitor2
+  formoney:
+    sche: 0 */30 * * * *  #每30分钟执行一次,查询请款失败的数据
+    sql: "select status,returncode,returnmsg,amount,applyserialno,bankserialno from app_formoney where status not in ('0','2')"
+    wav: monitor3
+  file:
+    sche: 0 0 2 ? * MON-FRI   #每个工作日凌晨2两点查询一次，一个不存在就报警
+    paths: E:\\JZBF\\ZD.deal, E:\\KJQS\\GZ.deal, E:\\TGH.deal, E:\\TZJY.deal
+    wav: monitor0
+
+  mobile: 81055,13910172960,13661304553  #被叫手机号码，半角逗号分割
+  dial-filepath: d:\\   #呼叫任务文件生成目录
+  trunkName: zxjt    #外呼使用的中继名称
