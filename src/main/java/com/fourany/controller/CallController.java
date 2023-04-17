@@ -29,6 +29,9 @@ public class CallController {
     @Value("${monitor.trunkName}")
     private String trunk;
 
+    @Value("${monitor.file.archiveCallFile}")
+    private String archiveCallFile;
+
     @PostMapping(value = "/callTrigger")
     public Result<Object> callTrigger(@RequestBody JSONObject jsonObject){
         log.info("收到管理端呼叫请求消息：{}",jsonObject);
@@ -42,7 +45,7 @@ public class CallController {
             return Result.error("消息体缺少参数：{{\"telnumber\": \"13910101010,13800138000\",\"content\": \"monitor.wav\"}}");
         }
 
-        CallUtils.makeCallFile("9", wav, dialFilepath, trunk, telNumber);
+        CallUtils.makeCallFile("9", wav, dialFilepath, trunk, telNumber, archiveCallFile);
         return Result.OK();
     }
 }

@@ -21,7 +21,7 @@ public class CallUtils {
      * @param trunk
      * @param dialNumber
      */
-    public static void makeCallFile(String callType, String wavFileName, String dialFilepath, String trunk, String dialNumber){
+    public static void makeCallFile(String callType, String wavFileName, String dialFilepath, String trunk, String dialNumber, String archive){
         String[] telArray = dialNumber.split(",");
         for(int i=0; i< telArray.length; i++){
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -37,6 +37,7 @@ public class CallUtils {
             appender.append("Context: zxjt-monitor");
             appender.append("Extension: s");
             appender.append("Priority: 1");
+            appender.append("Archive: " + archive);
             appender.append("Set: TASKFILE=" + wavFileName); //语音文件名根据类型命名
             appender.flush();
             log.info(String.format("外呼任务已生成{type:%s, fileName: %s, tel: %s}", callType, fileName, telArray[i]));

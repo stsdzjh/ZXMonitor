@@ -49,6 +49,9 @@ public class ZXMonitor
     @Value("${monitor.file.wav}")
     private String wavFile;
 
+    @Value("${monitor.file.archiveCallFile}")
+    private String archiveCallFile;
+
     public static void main( String[] args )
     {
         SpringApplication.run(ZXMonitor.class,args);
@@ -61,7 +64,7 @@ public class ZXMonitor
     private void monitorPublishLog(){
         List list = sqlService.queryPublishLog();
         if(list.size() > 0){
-            CallUtils.makeCallFile("1", wavPublishLog, dialFilepath, trunk, mobile);
+            CallUtils.makeCallFile("1", wavPublishLog, dialFilepath, trunk, mobile, archiveCallFile);
         }
     }
     /**
@@ -71,7 +74,7 @@ public class ZXMonitor
     private void monitorFlowChart(){
         List list = sqlService.queryFlowChart();
         if(list.size() > 0){
-            CallUtils.makeCallFile("2", wavFlowChart, dialFilepath, trunk, mobile);
+            CallUtils.makeCallFile("2", wavFlowChart, dialFilepath, trunk, mobile, archiveCallFile);
         }
     }
 
@@ -82,7 +85,7 @@ public class ZXMonitor
     private void monitorForMoney(){
         List list = sqlService.queryForMoney();
         if(list.size() > 0){
-            CallUtils.makeCallFile("3", wavForMoney, dialFilepath, trunk, mobile);
+            CallUtils.makeCallFile("3", wavForMoney, dialFilepath, trunk, mobile, archiveCallFile);
         }
     }
     /**
@@ -93,7 +96,7 @@ public class ZXMonitor
         System.out.println(fileArray);
         for(int i=0; i< fileArray.length; i++){
             if(!FileUtil.exist(fileArray[i])){
-                CallUtils.makeCallFile("0", wavFile, dialFilepath, trunk, mobile);
+                CallUtils.makeCallFile("0", wavFile, dialFilepath, trunk, mobile, archiveCallFile);
                 break;
             }
         }

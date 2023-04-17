@@ -37,3 +37,4 @@ monitor:
   mobile: 81055,13910170000,13661300000  #被叫手机号码，半角逗号分割
   dial-filepath: d:\\   #呼叫任务文件生成目录
   trunkName: zxjt    #外呼使用的中继名称
+  archiveCallFile: yes
