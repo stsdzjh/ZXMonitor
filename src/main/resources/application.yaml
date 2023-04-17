@@ -23,6 +23,6 @@ monitor:
     paths: E:\\JZBF\\ZD.deal, E:\\KJQS\\GZ.deal, E:\\TGH.deal, E:\\TZJY.deal
     wav: monitor0
 
-  mobile: 81055,13910172960,13661304553  #被叫手机号码，半角逗号分割
+  mobile: 81055,13910170000,13661300000  #被叫手机号码，半角逗号分割
   dial-filepath: d:\\   #呼叫任务文件生成目录
   trunkName: zxjt    #外呼使用的中继名称
