@@ -1,32 +1,44 @@
 package com.fourany;
 
 import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fourany.service.ISqlService;
 import com.fourany.utils.CallUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.client.RestTemplate;
+
 import javax.annotation.Resource;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import cn.hutool.core.io.file.FileAppender;
+
 /**
  * Hello world!
  *
  */
+@Slf4j
 @SpringBootApplication
 @EnableScheduling
 public class ZXMonitor
 {
+    @Autowired
+    private RestTemplate restTemplate;
+
     @Resource
     private ISqlService sqlService;
 
     @Value("${monitor.mobile}")
     private String mobile;
+
+    @Value("${monitor.dial-filepath-tmp}")
+    private String dialFilepathTmp;
 
     @Value("${monitor.dial-filepath}")
     private String dialFilepath;
@@ -49,8 +61,14 @@ public class ZXMonitor
     @Value("${monitor.file.wav}")
     private String wavFile;
 
-    @Value("${monitor.file.archiveCallFile}")
+    @Value("${monitor.archiveCallFile}")
     private String archiveCallFile;
+
+    @Value("${monitor.get-dial-info-url}")
+    private String dialInfoUrl;
+
+    @Value("${monitor.obcid}")
+    private String obcid;
 
     public static void main( String[] args )
     {
@@ -64,7 +82,22 @@ public class ZXMonitor
     private void monitorPublishLog(){
         List list = sqlService.queryPublishLog();
         if(list.size() > 0){
-            CallUtils.makeCallFile("1", wavPublishLog, dialFilepath, trunk, mobile, archiveCallFile);
+            String url = dialInfoUrl + "?monitorType=01";
+            JSONObject getResult = restTemplate.getForObject(url, JSONObject.class);
+            if(getResult.getString("code").equals("200")){
+                JSONArray data = getResult.getJSONArray("data");
+                for(int i=0; i< data.size(); i++){
+                    JSONObject item = data.getJSONObject(i);
+                    String telNumber = item.getString("telnumber");
+                    String wav = item.getString("content");
+                    String logId = item.getString("logId");
+                    CallUtils.makeCallFile("1", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile, logId);
+                }
+
+            }else{
+                log.error("请求失败");
+            }
+
         }
     }
     /**
@@ -74,7 +107,25 @@ public class ZXMonitor
     private void monitorFlowChart(){
         List list = sqlService.queryFlowChart();
         if(list.size() > 0){
-            CallUtils.makeCallFile("2", wavFlowChart, dialFilepath, trunk, mobile, archiveCallFile);
+            if(list.size() > 0){
+                String url = dialInfoUrl + "?monitorType=02";
+                JSONObject getResult = restTemplate.getForObject(url, JSONObject.class);
+                if(getResult.getString("code").equals("200")){
+                    JSONArray data = getResult.getJSONArray("data");
+                    for(int i=0; i< data.size(); i++){
+                        JSONObject item = data.getJSONObject(i);
+                        String telNumber = item.getString("telnumber");
+                        String wav = item.getString("content");
+                        String logId = item.getString("logId");
+                        CallUtils.makeCallFile("2", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId);
+                    }
+
+                }else{
+                    log.error("请求失败");
+                }
+
+            }
+
         }
     }
 
@@ -85,7 +136,22 @@ public class ZXMonitor
     private void monitorForMoney(){
         List list = sqlService.queryForMoney();
         if(list.size() > 0){
-            CallUtils.makeCallFile("3", wavForMoney, dialFilepath, trunk, mobile, archiveCallFile);
+            String url = dialInfoUrl + "?monitorType=03";
+            JSONObject getResult = restTemplate.getForObject(url, JSONObject.class);
+            if(getResult.getString("code").equals("200")){
+                JSONArray data = getResult.getJSONArray("data");
+                for(int i=0; i< data.size(); i++){
+                    JSONObject item = data.getJSONObject(i);
+                    String telNumber = item.getString("telnumber");
+                    String wav = item.getString("content");
+                    String logId = item.getString("logId");
+                    CallUtils.makeCallFile("3", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId);
+                }
+
+            }else{
+                log.error("请求失败");
+            }
+
         }
     }
     /**
@@ -93,10 +159,28 @@ public class ZXMonitor
      */
     @Scheduled(cron = "${monitor.file.sche}")
     private void monitorShareFile(){
-        System.out.println(fileArray);
+        log.info("fileArray: {}", fileArray);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        String nowDate = simpleDateFormat.format(new Date());
+
         for(int i=0; i< fileArray.length; i++){
-            if(!FileUtil.exist(fileArray[i])){
-                CallUtils.makeCallFile("0", wavFile, dialFilepath, trunk, mobile, archiveCallFile);
+            String fileName = fileArray[i].replace("#DATE#", nowDate);
+            if(!FileUtil.exist(fileName)){
+                String url = dialInfoUrl + "?monitorType=00";
+                JSONObject getResult = restTemplate.getForObject(url, JSONObject.class);
+                if(getResult.getString("code").equals("200")){
+                    JSONArray data = getResult.getJSONArray("data");
+                    for(int j=0; j< data.size(); j++){
+                        JSONObject item = data.getJSONObject(j);
+                        String telNumber = item.getString("telnumber");
+                        String wav = item.getString("content");
+                        String logId = item.getString("logId");
+                        CallUtils.makeCallFile("0", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId);
+                    }
+
+                }else{
+                    log.error("请求失败");
+                }
                 break;
             }
         }

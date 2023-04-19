@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * @Description: TODO
  * @author: zhangjh
@@ -22,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/callcenter")
 public class CallController {
+    @Value("${monitor.dial-filepath-tmp}")
+    private String dialFilepathTmp;
 
     @Value("${monitor.dial-filepath}")
     private String dialFilepath;
@@ -29,8 +29,12 @@ public class CallController {
     @Value("${monitor.trunkName}")
     private String trunk;
 
-    @Value("${monitor.file.archiveCallFile}")
+    @Value("${monitor.archiveCallFile}")
     private String archiveCallFile;
+
+    @Value("${monitor.obcid}")
+    private String obcid;
+
 
     @PostMapping(value = "/callTrigger")
     public Result<Object> callTrigger(@RequestBody JSONObject jsonObject){
@@ -41,11 +45,12 @@ public class CallController {
 
         String telNumber = jsonObject.getStr("telnumber");
         String wav = jsonObject.getStr("content");
+        String logId = jsonObject.getStr("logId");
         if(StringUtils.isEmpty(telNumber) || StringUtils.isEmpty(wav)){
             return Result.error("消息体缺少参数：{{\"telnumber\": \"13910101010,13800138000\",\"content\": \"monitor.wav\"}}");
         }
 
-        CallUtils.makeCallFile("9", wav, dialFilepath, trunk, telNumber, archiveCallFile);
+        CallUtils.makeCallFile("9", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile, logId);
         return Result.OK();
     }
 }
