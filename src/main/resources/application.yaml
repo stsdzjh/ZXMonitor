@@ -49,3 +49,5 @@ monitor:
   obcid: "0049"
   archiveCallFile: "yes"
   get-dial-info-url: https://931e-114-254-0-31.ngrok-free.app/system/monitor/getDialInfo
+  max-retries: 3    #失败后，最大重拨次数
+  retry-time: 300   #失败后，重拨等待时长：秒

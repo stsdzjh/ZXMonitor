@@ -35,6 +35,12 @@ public class CallController {
     @Value("${monitor.obcid}")
     private String obcid;
 
+    @Value("${monitor.max-retries}")
+    private String maxRetries;
+
+    @Value("${monitor.retry-time}")
+    private String retryTime;
+
 
     @PostMapping(value = "/callTrigger")
     public Result<Object> callTrigger(@RequestBody JSONObject jsonObject){
@@ -50,7 +56,7 @@ public class CallController {
             return Result.error("消息体缺少参数：{{\"telnumber\": \"13910101010,13800138000\",\"content\": \"monitor.wav\"}}");
         }
 
-        CallUtils.makeCallFile("9", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile, logId);
+        CallUtils.makeCallFile("9", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile, logId, maxRetries, retryTime);
         return Result.OK();
     }
 }

@@ -23,7 +23,7 @@ public class CallUtils {
      * @param trunk
      * @param dialNumber
      */
-    public static void makeCallFile(String callType, String wavFileName, String dialFilepathTmp, String dialFilepath, String trunk, String obcid, String dialNumber, String archive, String logId){
+    public static void makeCallFile(String callType, String wavFileName, String dialFilepathTmp, String dialFilepath, String trunk, String obcid, String dialNumber, String archive, String logId, String maxRetries, String retryTime){
         String[] telArray = dialNumber.split(",");
         for(int i=0; i< telArray.length; i++){
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -40,6 +40,8 @@ public class CallUtils {
             appender.append("Context: zxjt-monitor");
             appender.append("Extension: s");
             appender.append("Priority: 1");
+            appender.append("MaxRetries: " + maxRetries);
+            appender.append("RetryTime: " + retryTime);
             appender.append("Archive: " + archive);
             appender.append("Set: TASKFILE=" + wavFileName); //语音文件名根据类型命名
             appender.append("Set: DESTTEL=" + telArray[i]); //设置被叫号码通道变量

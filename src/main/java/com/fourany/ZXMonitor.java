@@ -70,6 +70,12 @@ public class ZXMonitor
     @Value("${monitor.obcid}")
     private String obcid;
 
+    @Value("${monitor.max-retries}")
+    private String maxRetries;
+
+    @Value("${monitor.retry-time}")
+    private String retryTime;
+
     public static void main( String[] args )
     {
         SpringApplication.run(ZXMonitor.class,args);
@@ -86,12 +92,15 @@ public class ZXMonitor
             JSONObject getResult = restTemplate.getForObject(url, JSONObject.class);
             if(getResult.getString("code").equals("200")){
                 JSONArray data = getResult.getJSONArray("data");
+                if(data == null ){
+                    return;
+                }
                 for(int i=0; i< data.size(); i++){
                     JSONObject item = data.getJSONObject(i);
                     String telNumber = item.getString("telnumber");
                     String wav = item.getString("content");
                     String logId = item.getString("logId");
-                    CallUtils.makeCallFile("1", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile, logId);
+                    CallUtils.makeCallFile("1", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile, logId, maxRetries, retryTime);
                 }
 
             }else{
@@ -112,12 +121,15 @@ public class ZXMonitor
                 JSONObject getResult = restTemplate.getForObject(url, JSONObject.class);
                 if(getResult.getString("code").equals("200")){
                     JSONArray data = getResult.getJSONArray("data");
+                    if(data == null ){
+                        return;
+                    }
                     for(int i=0; i< data.size(); i++){
                         JSONObject item = data.getJSONObject(i);
                         String telNumber = item.getString("telnumber");
                         String wav = item.getString("content");
                         String logId = item.getString("logId");
-                        CallUtils.makeCallFile("2", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId);
+                        CallUtils.makeCallFile("2", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId,  maxRetries, retryTime);
                     }
 
                 }else{
@@ -140,12 +152,15 @@ public class ZXMonitor
             JSONObject getResult = restTemplate.getForObject(url, JSONObject.class);
             if(getResult.getString("code").equals("200")){
                 JSONArray data = getResult.getJSONArray("data");
+                if(data == null ){
+                    return;
+                }
                 for(int i=0; i< data.size(); i++){
                     JSONObject item = data.getJSONObject(i);
                     String telNumber = item.getString("telnumber");
                     String wav = item.getString("content");
                     String logId = item.getString("logId");
-                    CallUtils.makeCallFile("3", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId);
+                    CallUtils.makeCallFile("3", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId, maxRetries, retryTime);
                 }
 
             }else{
@@ -170,12 +185,15 @@ public class ZXMonitor
                 JSONObject getResult = restTemplate.getForObject(url, JSONObject.class);
                 if(getResult.getString("code").equals("200")){
                     JSONArray data = getResult.getJSONArray("data");
+                    if(data == null ){
+                        break;
+                    }
                     for(int j=0; j< data.size(); j++){
                         JSONObject item = data.getJSONObject(j);
                         String telNumber = item.getString("telnumber");
                         String wav = item.getString("content");
                         String logId = item.getString("logId");
-                        CallUtils.makeCallFile("0", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId);
+                        CallUtils.makeCallFile("0", wav, dialFilepathTmp, dialFilepath, trunk, obcid, telNumber, archiveCallFile,logId, maxRetries, retryTime);
                     }
 
                 }else{
